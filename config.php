@@ -1,5 +1,4 @@
 <?php
-// Get values from Render Environment Variables
 $host = getenv('DB_HOST');
 $port = getenv('DB_PORT') ?: 5432;
 $db   = getenv('DB_NAME');
@@ -16,5 +15,5 @@ try {
         ]
     );
 } catch (PDOException $e) {
-    die("Database connection failed");
+    die($e->getMessage()); // 👈 TEMPORARY
 }
