@@ -2,132 +2,84 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Live UPI QR Generator</title>
+    <title>UPI QR Generator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-        }
-
-        .card {
-            background: #111;
-            border-radius: 18px;
-            padding: 30px;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 25px 45px rgba(0,0,0,0.6);
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #00e5ff;
-        }
-
-        label {
-            font-size: 14px;
-            opacity: 0.85;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            margin-top: 6px;
-            margin-bottom: 18px;
-            border-radius: 10px;
-            border: none;
-            outline: none;
-            background: #1f1f1f;
-            color: #fff;
-            font-size: 15px;
-        }
-
-        .qr-box {
-            margin-top: 20px;
-            text-align: center;
-            display: none;
-        }
-
-        .qr-box img {
-            background: #fff;
-            padding: 12px;
-            border-radius: 14px;
-            width: 260px;
-            height: 260px;
-        }
-
-        .amount {
-            margin-top: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #00e676;
-        }
-
-        footer {
-            text-align: center;
-            font-size: 12px;
-            margin-top: 22px;
-            opacity: 0.5;
-        }
-    </style>
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 flex items-center justify-center p-6">
 
-<div class="card">
-    <h2>💳 Live UPI QR Generator</h2>
+<div class="bg-black/80 rounded-2xl shadow-2xl w-full max-w-4xl p-8">
+    <h2 class="text-center text-2xl font-bold text-cyan-400 mb-8">
+        💳 UPI QR Generator
+    </h2>
 
-    <label>UPI ID</label>
-    <input type="text" id="upi_id" placeholder="example@upi">
+    <!-- Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-    <label>Payee Name</label>
-    <input type="text" id="name" placeholder="Your Name / Business">
+        <!-- LEFT: FORM -->
+        <div>
+            <label class="block text-sm text-gray-300 mb-1">UPI ID</label>
+            <input id="upi" type="text" placeholder="example@upi"
+                class="w-full mb-4 px-4 py-3 rounded-xl bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400">
 
-    <label>Amount (₹)</label>
-    <input type="number" id="amount" placeholder="Enter amount">
+            <label class="block text-sm text-gray-300 mb-1">Payee Name</label>
+            <input id="name" type="text" placeholder="Your Name / Business"
+                class="w-full mb-4 px-4 py-3 rounded-xl bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400">
 
-    <div class="qr-box" id="qrBox">
-        <p class="amount" id="amountText"></p>
-        <img id="qrImage" src="" alt="UPI QR Code">
+            <label class="block text-sm text-gray-300 mb-1">Amount (₹)</label>
+            <input id="amount" type="number" placeholder="Enter amount"
+                class="w-full px-4 py-3 rounded-xl bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400">
+        </div>
+
+        <!-- RIGHT: QR -->
+        <div class="flex flex-col items-center justify-center">
+            <div id="qrBox" class="hidden text-center">
+                <p id="amountText" class="text-lg font-semibold text-green-400 mb-3"></p>
+                <img id="qrImage" class="bg-white p-4 rounded-xl shadow-lg w-64 h-64">
+            </div>
+
+            <p id="placeholder" class="text-gray-500 text-sm text-center">
+                Enter details to generate QR code
+            </p>
+        </div>
     </div>
 
-    <footer>
-        Updates instantly • Powered by PHP + JS • Hosted on Render
-    </footer>
+    <p class="text-center text-xs text-gray-500 mt-8">
+        Powered by PHP • Tailwind CSS • Hosted on Render
+    </p>
 </div>
 
 <script>
-    const upiInput = document.getElementById('upi_id');
-    const nameInput = document.getElementById('name');
-    const amountInput = document.getElementById('amount');
+    const upi = document.getElementById('upi');
+    const nameField = document.getElementById('name');
+    const amount = document.getElementById('amount');
     const qrImage = document.getElementById('qrImage');
     const qrBox = document.getElementById('qrBox');
     const amountText = document.getElementById('amountText');
+    const placeholder = document.getElementById('placeholder');
 
     function updateQR() {
-        const upi = upiInput.value.trim();
-        const name = nameInput.value.trim();
-        const amount = amountInput.value.trim();
+        const u = upi.value.trim();
+        const n = nameField.value.trim();
+        const a = amount.value.trim();
 
-        if (upi && name && amount) {
-            const upiUrl = `upi://pay?pa=${upi}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`;
-            qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(upiUrl)}`;
-            amountText.textContent = `Scan to Pay ₹${amount}`;
-            qrBox.style.display = 'block';
+        if (u && n && a) {
+            const upiUrl = `upi://pay?pa=${u}&pn=${encodeURIComponent(n)}&am=${a}&cu=INR`;
+            qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiUrl)}`;
+            amountText.textContent = `Scan to Pay ₹${a}`;
+            qrBox.classList.remove('hidden');
+            placeholder.classList.add('hidden');
         } else {
-            qrBox.style.display = 'none';
+            qrBox.classList.add('hidden');
+            placeholder.classList.remove('hidden');
         }
     }
 
-    upiInput.addEventListener('input', updateQR);
-    nameInput.addEventListener('input', updateQR);
-    amountInput.addEventListener('input', updateQR);
+    upi.addEventListener('input', updateQR);
+    nameField.addEventListener('input', updateQR);
+    amount.addEventListener('input', updateQR);
 </script>
 
 </body>
